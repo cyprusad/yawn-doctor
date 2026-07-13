@@ -135,6 +135,39 @@ class CollectionJoinWithoutDistinctRuleTest {
     }
 
     @Test
+    fun `known limitation join hidden behind helper`() {
+        val code = """
+            $dsl
+            fun CriteriaScope<*>.addJoin(column: Column<*>) {
+                join(column)
+            }
+            fun test() {
+                session.createYawnCriteria(someTable) {
+                    addJoin(someColumn)
+                }.list()
+            }
+        """.trimIndent()
+        val findings = CollectionJoinWithoutDistinctRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
+    fun `known limitation join inside lambda nested block`() {
+        val code = """
+            $dsl
+            fun test() {
+                session.createYawnCriteria(someTable) {
+                    if (true) {
+                        join(someColumn)
+                    }
+                }.list()
+            }
+        """.trimIndent()
+        val findings = CollectionJoinWithoutDistinctRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
     fun `respects configured join names`() {
         val code = """
             $dsl

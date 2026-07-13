@@ -133,6 +133,18 @@ class MaterializedCountRuleTest {
     }
 
     @Test
+    fun `known limitation list dot isNotEmpty`() {
+        val code = """
+            $dsl
+            fun test() {
+                val present = session.createYawnCriteria(someTable) { }.list().isNotEmpty()
+            }
+        """.trimIndent()
+        val findings = MaterializedCountRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
     fun `respects configured query constructors`() {
         val code = """
             $dsl

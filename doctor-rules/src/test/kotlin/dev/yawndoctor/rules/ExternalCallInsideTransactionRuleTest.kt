@@ -128,6 +128,40 @@ class ExternalCallInsideTransactionRuleTest {
     }
 
     @Test
+    fun `known limitation programmatic transaction`() {
+        val code = """
+            $dsl
+            class TransactionManager {
+                fun begin() = Unit
+                fun commit() = Unit
+                fun rollback() = Unit
+            }
+            fun fulfill(manager: TransactionManager) {
+                manager.begin()
+                shippingClient.reserve(1L)
+                manager.commit()
+            }
+        """.trimIndent()
+        val findings = ExternalCallInsideTransactionRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
+    fun `known limitation local class with suspicious name outside transaction`() {
+        val code = """
+            $dsl
+            class RemoteClient {
+                fun send(msg: String) = Unit
+            }
+            fun test() {
+                RemoteClient().send("hello")
+            }
+        """.trimIndent()
+        val findings = ExternalCallInsideTransactionRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
     fun `respects configured transaction annotations`() {
         val code = """
             $dsl

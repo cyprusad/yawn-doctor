@@ -171,6 +171,21 @@ class QueryInsideLoopRuleTest {
     }
 
     @Test
+    fun `known limitation query constructor stored in variable`() {
+        val code = """
+            $dsl
+            fun test() {
+                val q = session.createYawnCriteria(someTable) { }
+                listOf(1, 2, 3).forEach {
+                    q.list()
+                }
+            }
+        """.trimIndent()
+        val findings = QueryInsideLoopRule(TestConfig()).compileAndLint(code)
+        assertTrue(findings.isEmpty())
+    }
+
+    @Test
     fun `does not report count when query is before loop`() {
         val code = """
             $dsl
