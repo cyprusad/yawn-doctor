@@ -17,3 +17,10 @@ YawnDoctor:
       - flatMap
       - associate
       - onEach
+
+  MaterializedCount:
+    active: true
+    queryConstructors:
+      - query
+      - createYawnCriteria
+      - createCriteria

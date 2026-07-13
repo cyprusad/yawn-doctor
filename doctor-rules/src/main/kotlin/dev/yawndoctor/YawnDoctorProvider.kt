@@ -1,5 +1,6 @@
 package dev.yawndoctor
 
+import dev.yawndoctor.rules.MaterializedCountRule
 import dev.yawndoctor.rules.QueryInsideLoopRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
@@ -12,7 +13,10 @@ class YawnDoctorProvider : RuleSetProvider {
     override fun instance(config: Config): RuleSet {
         return RuleSet(
             ruleSetId,
-            listOf(QueryInsideLoopRule(config)),
+            listOf(
+                QueryInsideLoopRule(config),
+                MaterializedCountRule(config),
+            ),
         )
     }
 }
