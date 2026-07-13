@@ -79,6 +79,27 @@ identify patterns. There is no runtime database, no bytecode analysis, and no
 type resolution. Detection is deterministic — the same source always produces
 the same findings.
 
+## Performance
+
+Analysis overhead from the 3 custom rules is negligible — roughly **9ms** added
+to a cold build in benchmarks. Total detekt time is dominated by Kotlin
+compilation and Detekt's own framework overhead, not the Yawn Doctor rules.
+
+**Benchmarks (cold build = `clean` + compile + detekt on a ~15 KB project):**
+
+| Scenario | Cold | Cached (no-op) |
+|---|---|---|
+| With Yawn Doctor | ~0.64s | ~0.35s |
+| Without Yawn Doctor | ~0.63s | ~0.34s |
+| Overhead | ~9ms | ~7ms |
+
+Scaling to a **372 KB file with 5000 N+1 patterns**: ~8.4s cold, ~0.34s cached.
+
+The rules use cheap operations — string name checks, short receiver-chain walks
+(3–5 nodes), and parent-tree walks that stop at the nearest enclosing function.
+Detekt processes files in parallel, so adding more files to a codebase scales
+with available cores rather than adding sequential cost.
+
 ## Limitations
 
 - **No interprocedural analysis.** Queries or external calls hidden behind
