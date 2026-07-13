@@ -1,5 +1,6 @@
 package dev.yawndoctor
 
+import dev.yawndoctor.rules.CollectionJoinWithoutDistinctRule
 import dev.yawndoctor.rules.ExternalCallInsideTransactionRule
 import dev.yawndoctor.rules.MaterializedCountRule
 import dev.yawndoctor.rules.QueryInsideLoopRule
@@ -18,6 +19,7 @@ class YawnDoctorProvider : RuleSetProvider {
                 QueryInsideLoopRule(config),
                 MaterializedCountRule(config),
                 ExternalCallInsideTransactionRule(config),
+                CollectionJoinWithoutDistinctRule(config),
             ),
         )
     }

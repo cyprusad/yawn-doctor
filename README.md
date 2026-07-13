@@ -18,6 +18,7 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 | QueryInsideLoop | YAWN001 | ORM query terminals (`list`, `first`, `single`, `count`) inside iteration constructs (`forEach`, `map`, `for`, `while`) — the N+1 pattern. |
 | MaterializedCount | YAWN002 | Query results fully materialized via `.list()` and then counted with `.size` or `.count()` instead of a database-level count. |
 | ExternalCallInsideTransaction | YAWN003 | External I/O calls (matching configurable receiver/method patterns) inside a transaction scope (`@Transactional` annotation or lambda-based `transaction {}`, `open {}`, etc.). |
+| CollectionJoinWithoutDistinct | YAWN004 | Entity queries that join collection associations and call `.list()` without deduplication, risking duplicate root entities in the result. |
 
 ## Prerequisites
 

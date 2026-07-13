@@ -4,6 +4,7 @@ export type FindingCategory =
   | "DATABASE_ROUND_TRIPS"
   | "UNNECESSARY_HYDRATION"
   | "TRANSACTION_BOUNDARIES"
+  | "ENTITY_QUERY"
 
 export interface DoctorFinding {
   id: string

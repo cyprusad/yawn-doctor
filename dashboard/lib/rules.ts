@@ -60,6 +60,30 @@ export const ruleCatalog: Record<string, RuleCatalogEntry> = {
     documentationSlug: "yawn002-materialized-count",
   },
 
+  "CollectionJoinWithoutDistinct": {
+    ruleId: "CollectionJoinWithoutDistinct",
+    yawnId: "YAWN004",
+    title: "Collection join without distinct",
+    category: "ENTITY_QUERY",
+    severity: "warning",
+    confidence: "medium",
+    explanation:
+      "An entity query joins a collection association (OneToMany/ManyToMany) and calls " +
+      ".list() without deduplication. Collection joins can return the same root entity " +
+      "multiple times — once per joined child row. Callers that iterate the result " +
+      "to delete, update, or count parents will see duplicates.",
+    impact:
+      "Duplicate root entities cause overfetching (duplicate parent rows across the wire), " +
+      "extra hydration work, and application-level bugs when iterating for deletion, " +
+      "updates, or counting. Every call site must remember to dedup, which is fragile.",
+    remediations: [
+      "Add .distinctBy { it.id } after .list() to deduplicate in application code.",
+      "Use .distinctRootEntity() when the ORM API provides it (e.g. Hibernate's DISTINCT_ROOT_ENTITY result transformer).",
+      "Consider whether a join is necessary at all for the use case.",
+    ],
+    documentationSlug: "yawn004-collection-join-without-distinct",
+  },
+
   "ExternalCallInsideTransaction": {
     ruleId: "ExternalCallInsideTransaction",
     yawnId: "YAWN003",

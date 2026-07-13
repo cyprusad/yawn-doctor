@@ -25,6 +25,21 @@ YawnDoctor:
       - createYawnCriteria
       - createCriteria
 
+  CollectionJoinWithoutDistinct:
+    active: true
+    queryConstructors:
+      - createYawnCriteria
+      - createCriteria
+      - query
+    queryTerminals:
+      - list
+    joinFunctionNames:
+      - join
+      - createAlias
+    distinctMethods:
+      - distinctBy
+      - distinctRootEntity
+
   ExternalCallInsideTransaction:
     active: true
     transactionAnnotations:
