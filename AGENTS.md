@@ -166,3 +166,77 @@ This avoids stale-JAR confusion.
 - **No commit until told:** the agent does not commit unless the user explicitly
   says so.
 - **Force-push on first publish** of a branch (prior history is ephemeral).
+- **Auto-generated files never committed:** `findings.json`, `node_modules/`,
+  `build/` directories, and Gradle build artifacts are gitignored.
+
+---
+
+## Detekt typed vs untyped tasks
+
+Detekt 1.23.x introduces typed source-set variants (`detektMain`,
+`detektTest`) alongside the untyped `detekt` task. The typed variant is the
+canonical one. Reports live at `build/reports/detekt/main.*` rather than
+`build/reports/detekt/detekt.*`. When configuring reports, use the typed
+variant explicitly:
+
+```kotlin
+tasks.register("myTask") {
+    dependsOn(tasks.named("detektMain"))
+}
+```
+
+Both tasks can run in the same build, so depending on
+`tasks.withType<Detekt>()` triggers both — prefer the typed name.
+
+---
+
+## SARIF structure (detekt output)
+
+The SARIF report at `demo-codebase/build/reports/detekt/main.sarif` has this
+shape:
+
+- `runs[0].results[].ruleId` e.g. `detekt.YawnDoctor.QueryInsideLoop`
+- `runs[0].results[].message.text` — full human-readable message with `[YAWN001]`
+- `runs[0].results[].locations[0].physicalLocation`:
+  - `artifactLocation.uri` — `file://` absolute path
+  - `region.startLine`, `startColumn`, `endLine`, `endColumn`
+- `runs[0].tool.driver.rules[]` — full rule descriptors with descriptions
+
+When writing a converter, strip `file://` from URIs, map the last segment of
+`ruleId` (e.g. `QueryInsideLoop`) to YAWN IDs, and strip the `[YAWN001][HIGH]`
+prefix from messages.
+
+---
+
+## Dashboard / TypeScript toolchain conventions
+
+- **pnpm** is the package manager (not npm, not yarn).
+- **tsx** runs TypeScript scripts directly (no compile step).
+- Scripts live in `dashboard/scripts/` and are invoked via `pnpm <script>`.
+- Outputs go to `dashboard/public/` (static files served by the dashboard).
+- The rule metadata catalog lives in `dashboard/lib/rules.ts`, keyed by the
+  short rule class name (e.g. `QueryInsideLoop`).
+- `findings.json` is gitignored — always regenerate before running the
+  dashboard.
+
+### Gradle + pnpm interop
+
+The root `build.gradle.kts` has a `yawnDoctorReport` task that chains detekt →
+pnpm report → pnpm verify-report. It automatically installs pnpm dependencies
+if `node_modules/` is missing.
+
+---
+
+## Demo code compilation requirements
+
+Detekt parses but does not compile Kotlin. The demo codebase IS compiled when
+`detektMain` runs (Gradle compiles sources before analysis). This means:
+- All demo files must compile with valid Kotlin.
+- Classes used as expressions (e.g. `session.query(UserTable)`) need proper
+  instantiation syntax: `session.query(UserTable())`.
+- Types used in inheritance must be `open`.
+- Stub types with unused parameters or constant returns should be suppressed:
+
+```kotlin
+@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")
+```

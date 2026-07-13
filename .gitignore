@@ -13,3 +13,8 @@ Thumbs.db
 
 # Plan doc (removed from tracking)
 yawn-doctor-plan.md
+
+# Node.js / dashboard
+node_modules/
+dashboard/dist/
+dashboard/public/findings.json

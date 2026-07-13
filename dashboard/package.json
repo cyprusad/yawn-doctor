@@ -1,0 +1,15 @@
+{
+  "name": "yawn-doctor-dashboard",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "report": "tsx scripts/convert-sarif.ts",
+    "verify-report": "tsx scripts/verify-report.ts",
+    "full": "pnpm report && pnpm verify-report"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}
