@@ -17,7 +17,6 @@ detekt {
     toolVersion = "1.23.8"
     config.setFrom(file("${rootDir}/detekt.yml"))
     buildUponDefaultConfig = true
-
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

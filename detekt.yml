@@ -2,7 +2,18 @@ YawnDoctor:
   active: true
   QueryInsideLoop:
     active: true
-  MaterializedCount:
-    active: true
-  ExternalCallInsideTransaction:
-    active: true
+    queryConstructors:
+      - query
+      - createYawnCriteria
+      - createCriteria
+    queryTerminals:
+      - list
+      - first
+      - single
+      - count
+    iterationFunctions:
+      - forEach
+      - map
+      - flatMap
+      - associate
+      - onEach
