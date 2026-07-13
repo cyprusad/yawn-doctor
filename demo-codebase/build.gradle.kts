@@ -44,11 +44,21 @@ val yawnIds = mapOf(
     "QueryInsideLoop" to "YAWN001",
     "MaterializedCount" to "YAWN002",
     "ExternalCallInsideTransaction" to "YAWN003",
+    "CollectionJoinWithoutDistinct" to "YAWN004",
 )
 val yawnSeverities = mapOf(
     "QueryInsideLoop" to "HIGH",
     "MaterializedCount" to "HIGH",
     "ExternalCallInsideTransaction" to "HIGH",
+    "CollectionJoinWithoutDistinct" to "HIGH",
+)
+
+/** Fix hints keyed by rule class name */
+val yawnHints = mapOf(
+    "QueryInsideLoop" to "Collect identifiers before the loop and fetch matching rows in one bulk query.",
+    "MaterializedCount" to "Use a database-level count projection or dedicated count query instead of list().size.",
+    "ExternalCallInsideTransaction" to "Move external I/O outside the transaction, or use a transactional outbox pattern.",
+    "CollectionJoinWithoutDistinct" to "Add .distinctBy { it.id } after .list() to deduplicate root entities.",
 )
 
 /** Colourise findings in a rustc-like style */
@@ -64,6 +74,7 @@ tasks.register("yawnDoctorDemo") {
         }
 
         var count = 0
+        val seenRules = mutableSetOf<String>()
         // Format: RuleName - [entity] at /path/File.kt:line:col - Signature=Class.kt$Class$method(args)
         val findingPat = Regex("""^(\w+) - \[([^\]]+)\] at (.+\.kt):(\d+):(\d+) - Signature=(?:\w+\.kt\$)?(\w+(?:\.\w+)*)\$?(.*)""")
 
@@ -72,6 +83,7 @@ tasks.register("yawnDoctorDemo") {
             val (ruleName, entity, file, ln, col, cls, call) = m.destructured
             val id = yawnIds[ruleName] ?: continue
             count++
+            seenRules.add(ruleName)
             val sc = c["rd"]
             // Derive a display name: use actual entity name when available,
             // fall back to the signature so lambdas show "Class.method()" instead
@@ -85,8 +97,23 @@ tasks.register("yawnDoctorDemo") {
 
         if (count == 0) {
             println("${c["gn"]}${c["b"]}OK${c["r"]} — no Yawn Doctor findings")
-        } else {
-            throw GradleException("Found $count Yawn Doctor violation(s). See above.")
+            return@doLast
         }
+
+        // Print remediation hints grouped by rule
+        println("  ${c["d"]}────────────────────────────────────────────${c["r"]}")
+        println("  ${c["b"]}How to fix${c["r"]}")
+        println()
+        for (ruleName in seenRules.sorted()) {
+            val id = yawnIds[ruleName] ?: continue
+            val hint = yawnHints[ruleName] ?: continue
+            println("  ${c["yl"]}$id${c["r"]}  ${c["b"]}$ruleName${c["r"]}")
+            println("       $hint")
+            println()
+        }
+        println("  ${c["d"]}────────────────────────────────────────────${c["r"]}")
+
+        val summary = seenRules.sorted().joinToString(", ") { "${yawnIds[it] ?: it} (${it})" }
+        throw GradleException("Found $count Yawn Doctor violation(s): $summary")
     }
 }
