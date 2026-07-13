@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs"
 import { resolve, relative, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 import { ruleCatalog } from "../lib/rules.js"
-import type { DoctorFinding, ReportOutput, FindingCategory, FindingSeverity } from "../lib/types.js"
+import type { DoctorFinding, ReportOutput } from "../lib/types.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(__dirname, "../..")

@@ -20,5 +20,6 @@ tasks.register("yawnDoctorReport") {
 
         exec { workingDir = dashboardDir; commandLine("pnpm", "report") }
         exec { workingDir = dashboardDir; commandLine("pnpm", "verify-report") }
+        exec { workingDir = dashboardDir; commandLine("pnpm", "build") }
     }
 }

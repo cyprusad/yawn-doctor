@@ -31,6 +31,9 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 # Individual steps:
 ./gradlew :demo-codebase:detektMain                           # generate SARIF
 cd dashboard && pnpm report && pnpm verify-report             # convert + verify
+
+# Dashoard:
+cd dashboard && pnpm dev                                      # dev server at http://localhost:3000
 ```
 
 ## Project structure
@@ -50,12 +53,15 @@ demo-codebase/         # Demo Kotlin source with risky and safe examples
       ├── BrandRepository.kt       # YAWN002: list().size
       └── FulfillmentService.kt    # YAWN003: I/O inside @Transactional + open{}
 
-dashboard/             # SARIF normalization (TypeScript)
+dashboard/             # Next.js dashboard + SARIF normalization (TypeScript)
+  ├── app/             # Dashboard pages (Next.js App Router)
+  ├── components/      # SummaryCards, SourceViewer, DetailPanel
   ├── lib/rules.ts     # Rule metadata catalog
   ├── scripts/
   │   ├── convert-sarif.ts    # SARIF → findings.json
   │   └── verify-report.ts    # asserts YAWN001-003 present
-  └── public/findings.json    # generated output (gitignored)
+  ├── public/findings.json    # generated output (gitignored)
+  └── out/             # static export (gitignored)
 ```
 
 ## How the detection works

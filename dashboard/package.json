@@ -6,10 +6,24 @@
   "scripts": {
     "report": "tsx scripts/convert-sarif.ts",
     "verify-report": "tsx scripts/verify-report.ts",
-    "full": "pnpm report && pnpm verify-report"
+    "full": "pnpm report && pnpm verify-report",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out"
+  },
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
   },
   "devDependencies": {
+    "@types/node": "26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   }
 }

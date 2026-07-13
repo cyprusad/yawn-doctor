@@ -16,5 +16,7 @@ yawn-doctor-plan.md
 
 # Node.js / dashboard
 node_modules/
+.next/
 dashboard/dist/
+dashboard/out/
 dashboard/public/findings.json
