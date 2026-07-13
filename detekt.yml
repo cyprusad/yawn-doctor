@@ -24,3 +24,26 @@ YawnDoctor:
       - query
       - createYawnCriteria
       - createCriteria
+
+  ExternalCallInsideTransaction:
+    active: true
+    transactionAnnotations:
+      - Transactional
+    transactionFunctions:
+      - transaction
+      - inTransaction
+      - withTransaction
+      - open
+    suspiciousReceiverPatterns:
+      - ".*Client"
+      - ".*Publisher"
+      - ".*Producer"
+      - "httpClient"
+    suspiciousMethodNames:
+      - send
+      - publish
+      - post
+      - execute
+      - reserve
+      - notify
+      - sleep

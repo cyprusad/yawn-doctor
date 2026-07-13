@@ -1,5 +1,6 @@
 package dev.yawndoctor
 
+import dev.yawndoctor.rules.ExternalCallInsideTransactionRule
 import dev.yawndoctor.rules.MaterializedCountRule
 import dev.yawndoctor.rules.QueryInsideLoopRule
 import io.gitlab.arturbosch.detekt.api.Config
@@ -16,6 +17,7 @@ class YawnDoctorProvider : RuleSetProvider {
             listOf(
                 QueryInsideLoopRule(config),
                 MaterializedCountRule(config),
+                ExternalCallInsideTransactionRule(config),
             ),
         )
     }

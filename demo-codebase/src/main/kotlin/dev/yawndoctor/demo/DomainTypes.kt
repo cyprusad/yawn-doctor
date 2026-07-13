@@ -1,6 +1,12 @@
+// Stub types for demo purposes — @Suppress avoids noise from built-in detekt
+// rules (FunctionOnlyReturningConstant, UnusedParameter) that aren't relevant
+// to the Yawn Doctor rules being demonstrated.
+
+@file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter", "UnsafeCallOnNullableType")
+
 package dev.yawndoctor.demo
 
-class Table<T>(val name: String)
+open class Table<T>(val name: String)
 
 data class Order(val id: Long, val brandId: Long)
 
@@ -21,4 +27,21 @@ class Query<T> {
 
 class Session {
     fun <T> query(table: Table<T>): Query<T> = Query()
+}
+
+annotation class Transactional
+
+class ShippingClient {
+    fun reserve(id: Long) = Unit
+    fun notify(id: Long) = Unit
+}
+
+class EventPublisher {
+    fun publish(event: Any) = Unit
+}
+
+class YawnTestSession(val hibernateSession: Any)
+
+class YawnTestTransactor {
+    fun <T> open(lambda: (YawnTestSession) -> T): T = null!!
 }
