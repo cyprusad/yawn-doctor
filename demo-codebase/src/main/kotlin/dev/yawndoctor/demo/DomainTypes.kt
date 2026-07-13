@@ -25,8 +25,19 @@ class Query<T> {
     fun countProjection(): Long = 0
 }
 
+class Column<T>
+
+class CriteriaScope<T> {
+    fun join(column: Any, joinType: Any = "INNER") = Unit
+    fun <V> addEq(column: Column<V>, value: V) = Unit
+}
+
 class Session {
     fun <T> query(table: Table<T>): Query<T> = Query()
+    fun <T> createYawnCriteria(
+        table: Table<T>,
+        block: CriteriaScope<T>.() -> Unit,
+    ): Query<T> = null!!
 }
 
 annotation class Transactional
