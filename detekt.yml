@@ -1,0 +1,8 @@
+YawnDoctor:
+  active: true
+  QueryInsideLoop:
+    active: true
+  MaterializedCount:
+    active: true
+  ExternalCallInsideTransaction:
+    active: true
