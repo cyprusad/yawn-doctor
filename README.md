@@ -3,6 +3,14 @@
 Explainable static analysis for risky Kotlin ORM patterns, built as a
 [Detekt](https://detekt.dev) custom rule set.
 
+## Documentation
+
+- [Architecture](docs/architecture.md) — Why Detekt, why SARIF, design tradeoffs.
+- [Rule Design](docs/rule-design.md) — Per-rule intent, matched syntax, confidence, remediation.
+- [False Positives](docs/false-positives.md) — Known limitations and blind spots.
+- [Demo Script](docs/demo-script.md) — Under-60-second walkthrough.
+- [Learning Notes](docs/learning-notes.md) — Development log and surprises.
+
 ## What it detects
 
 | Rule | ID | Detects |
@@ -32,7 +40,7 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 ./gradlew :demo-codebase:detektMain                           # generate SARIF
 cd dashboard && pnpm report && pnpm verify-report             # convert + verify
 
-# Dashoard:
+# Dashboard:
 cd dashboard && pnpm dev                                      # dev server at http://localhost:3000
 ```
 
@@ -70,6 +78,19 @@ The rules use Detekt's PSI (Program Structure Interface) AST traversal to
 identify patterns. There is no runtime database, no bytecode analysis, and no
 type resolution. Detection is deterministic — the same source always produces
 the same findings.
+
+## Limitations
+
+- **No interprocedural analysis.** Queries or external calls hidden behind
+  helpers or variables are not detected.
+- **No type resolution.** The analyzer relies on configured method/receiver
+  name patterns, not runtime type information.
+- **No runtime measurement.** Findings identify syntactic patterns, not actual
+  round trips or result-set sizes.
+- **Deterministic by design.** The same source always produces the same
+  findings — no machine learning or probabilistic scores.
+
+See [false-positives.md](docs/false-positives.md) for full details.
 
 See `detekt.yml` for rule configuration options (query constructors, iteration
 functions, transaction annotations, suspicious receiver/method patterns).
