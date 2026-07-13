@@ -100,6 +100,10 @@ The rules use cheap operations — string name checks, short receiver-chain walk
 Detekt processes files in parallel, so adding more files to a codebase scales
 with available cores rather than adding sequential cost.
 
+In practice, a single changed file triggers incremental compilation (~0.3-0.5s)
+plus a full detekt re-analysis (~0.1-0.2s). The 9ms overhead of the custom
+rules is the same regardless.
+
 ## Limitations
 
 - **No interprocedural analysis.** Queries or external calls hidden behind
