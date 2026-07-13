@@ -240,3 +240,49 @@ Detekt parses but does not compile Kotlin. The demo codebase IS compiled when
 ```kotlin
 @file:Suppress("FunctionOnlyReturningConstant", "UnusedParameter")
 ```
+
+---
+
+## GitHub Annotations (CI)
+
+### What they are
+
+GitHub Actions parses `::warning file=...,line=...,col=...::message` from stdout
+and displays them as inline annotations on PR diffs — yellow squiggles on
+specific lines with a hover tooltip.
+
+### How they're generated
+
+`scripts/gh-annotations.sh` reads the detekt text report
+(`demo-codebase/build/reports/detekt/main.txt`) and emits one
+`::warning` command per finding. The workflow in
+`.github/workflows/yawn-doctor.yml` runs this after `detektMain`.
+
+### Workflow structure
+
+1. **Trigger:** PR or push to `main` touching `.kt`/`.kts`/`detekt.yml`/rule
+   source or demo code.
+2. **Setup:** checkout → JDK 17 (Zulu) → Gradle setup.
+3. **Detekt:** `./gradlew :demo-codebase:detektMain --no-daemon` (no daemon
+   avoids stale-JAR caching in ephemeral CI).
+4. **Annotations:** `scripts/gh-annotations.sh` emits `::warning` commands.
+5. **SARIF upload:** `github/codeql-action/upload-sarif@v3` submits the SARIF
+   report for GitHub code scanning (visible in Security tab).
+
+### Text report format parsed by the script
+
+```
+RuleName - [entity] at /abs/path/File.kt:line:col - Signature=...
+```
+
+The script maps `RuleName` to `YAWN_ID` via a `case` statement.
+
+### Testing locally
+
+```bash
+# Without GITHUB_WORKSPACE — shows absolute paths
+./scripts/gh-annotations.sh
+
+# With GITHUB_WORKSPACE — shows relative paths
+GITHUB_WORKSPACE=$PWD ./scripts/gh-annotations.sh
+```

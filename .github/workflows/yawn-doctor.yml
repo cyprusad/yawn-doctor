@@ -1,0 +1,51 @@
+name: Yawn Doctor
+
+on:
+  pull_request:
+    paths:
+      - "**/*.kt"
+      - "**/*.kts"
+      - "detekt.yml"
+      - "doctor-rules/**"
+      - "demo-codebase/**"
+  push:
+    branches: [main]
+    paths:
+      - "**/*.kt"
+      - "**/*.kts"
+      - "detekt.yml"
+      - "doctor-rules/**"
+      - "demo-codebase/**"
+
+env:
+  JAVA_OPTS: "-Xmx2g"
+
+jobs:
+  detekt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run detekt
+        run: ./gradlew :demo-codebase:detektMain --no-daemon
+        # --no-daemon avoids stale-classpath issues in ephemeral CI
+
+      - name: Generate GitHub Annotations
+        run: |
+          ./scripts/gh-annotations.sh demo-codebase/build/reports/detekt/main.txt
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: demo-codebase/build/reports/detekt/main.sarif
+          category: yawn-doctor
