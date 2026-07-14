@@ -45,7 +45,7 @@ while IFS= read -r line; do
     rel="${rel#./}"
 
     echo "::warning file=$rel,line=$ln,col=$col,title=[$id] $rule::$rel:$ln:$col — $id $rule"
-    ((count++))
+    ((++count))
   fi
 done < "$report"
 

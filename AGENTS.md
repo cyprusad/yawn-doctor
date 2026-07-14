@@ -286,3 +286,11 @@ The script maps `RuleName` to `YAWN_ID` via a `case` statement.
 # With GITHUB_WORKSPACE — shows relative paths
 GITHUB_WORKSPACE=$PWD ./scripts/gh-annotations.sh
 ```
+
+### Bash pitfall: `((count++))` with `set -e`
+
+`((count++))` returns exit code 1 when the old value is 0 (the increment
+succeeds, but the *evaluated result* is the old value, which is zero = false).
+Under `set -euo pipefail` this terminates the script immediately.
+
+Always use `((++count))` or `count=$((count + 1))` instead.
