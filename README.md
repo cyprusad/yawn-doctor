@@ -39,8 +39,8 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 ./gradlew :demo-codebase:detektMain     # generate SARIF
 ./gradlew yawnDoctorConvert             # SARIF → findings.json
 
-# Dashboard dev server at http://localhost:3000
-./gradlew yawnDoctorDashboard
+# Start the dashboard dev server at http://localhost:3000 (run from dashboard/)
+cd dashboard && pnpm dev
 ```
 
 ## Project structure

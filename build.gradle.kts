@@ -29,21 +29,6 @@ tasks.register("yawnDoctorReport") {
     }
 }
 
-/** Start the dashboard dev server */
-tasks.register("yawnDoctorDashboard") {
-    description = "Start the dashboard dev server at http://localhost:3000"
-
-    val dashboardDir = rootProject.file("dashboard")
-    doLast {
-        if (!dashboardDir.resolve("node_modules").exists()) {
-            logger.warn("dashboard/node_modules not found — running pnpm install")
-            runPnpm(dashboardDir, "install")
-        }
-        println("\n  Yawn Doctor dashboard at http://localhost:3000\n")
-        runPnpm(dashboardDir, "dev")
-    }
-}
-
 /** Convert SARIF to findings.json (requires detektMain first) */
 tasks.register("yawnDoctorConvert") {
     description = "Convert the latest SARIF report to findings.json"
