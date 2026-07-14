@@ -12,6 +12,7 @@ const cardConfig: Record<string, { label: string; color: string }> = {
   DATABASE_ROUND_TRIPS: { label: "Database round trips", color: "var(--red)" },
   UNNECESSARY_HYDRATION: { label: "Unnecessary hydration", color: "var(--orange)" },
   TRANSACTION_BOUNDARIES: { label: "Transaction boundaries", color: "var(--purple)" },
+  ENTITY_QUERY: { label: "Entity query", color: "var(--yellow)" },
 }
 
 export default function SummaryCards({ findings, onFilter, activeFilter }: Props) {

@@ -1,9 +1,8 @@
 /**
  * verify-report.ts
  *
- * Reads findings.json and verifies that all three expected Yawn Doctor
- * rule IDs (YAWN001, YAWN002, YAWN003) are present. Exits non-zero if
- * any are missing.
+ * Reads findings.json and verifies that all expected Yawn Doctor
+ * rule IDs are present. Exits non-zero if any are missing.
  *
  * Usage:
  *   pnpm verify-report
@@ -18,7 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(__dirname, "../..")
 const defaultJsonPath = resolve(projectRoot, "dashboard/public/findings.json")
 
-const expectedRuleIds = ["YAWN001", "YAWN002", "YAWN003"]
+const expectedRuleIds = ["YAWN001", "YAWN002", "YAWN003", "YAWN004"]
 
 function fail(message: string): never {
   console.error(`FAIL: ${message}`)

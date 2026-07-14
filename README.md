@@ -26,7 +26,7 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 ## Commands
 
 ```bash
-# Run all 29 rule tests
+# Run all 44 rule tests
 ./gradlew :doctor-rules:test
 
 # Run the demo with coloured rustc-style output
@@ -48,17 +48,18 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 ```
 doctor-rules/          # Detekt plugin (Kotlin)
   ├── src/main/kotlin/dev/yawndoctor/
-  │   ├── rules/       # QueryInsideLoop, MaterializedCount, ExternalCallInsideTransaction
+   │   ├── rules/       # QueryInsideLoop, MaterializedCount, ExternalCallInsideTransaction, CollectionJoinWithoutDistinct
   │   ├── ast/         # PSI helper functions (CallChain, LoopContext, QueryOrigin, TransactionContext)
   │   └── YawnDoctorProvider.kt
-  └── src/test/kotlin/dev/yawndoctor/rules/  # 29 focused tests
+  └── src/test/kotlin/dev/yawndoctor/rules/  # 44 focused tests
 
 demo-codebase/         # Demo Kotlin source with risky and safe examples
   └── src/main/kotlin/dev/yawndoctor/demo/
       ├── DomainTypes.kt           # Fake ORM DSL stubs
       ├── UserRepository.kt        # YAWN001: N+1 in forEach + map
       ├── BrandRepository.kt       # YAWN002: list().size
-      └── FulfillmentService.kt    # YAWN003: I/O inside @Transactional + open{}
+      ├── FulfillmentService.kt    # YAWN003: I/O inside @Transactional + open{}
+      └── BookRepository.kt        # YAWN004: collection join without distinct
 
 dashboard/             # Next.js dashboard + SARIF normalization (TypeScript)
   ├── app/             # Dashboard pages (Next.js App Router)
@@ -66,7 +67,7 @@ dashboard/             # Next.js dashboard + SARIF normalization (TypeScript)
   ├── lib/rules.ts     # Rule metadata catalog
   ├── scripts/
   │   ├── convert-sarif.ts    # SARIF → findings.json
-  │   └── verify-report.ts    # asserts YAWN001-003 present
+  │   └── verify-report.ts    # asserts all rule IDs present
   ├── public/findings.json    # generated output (gitignored)
   └── out/             # static export (gitignored)
 ```
@@ -80,7 +81,7 @@ the same findings.
 
 ## Performance
 
-Analysis overhead from the 3 custom rules is negligible — roughly **9ms** added
+Analysis overhead from the 4 custom rules is negligible — roughly **9ms** added
 to a cold build in benchmarks. Total detekt time is dominated by Kotlin
 compilation and Detekt's own framework overhead, not the Yawn Doctor rules.
 

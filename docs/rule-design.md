@@ -182,3 +182,71 @@ outside transactions and for local helpers.
 - Static analysis cannot know whether a method performs network I/O.
 - Interprocedural transaction propagation is not handled.
 - The best remediation depends on consistency requirements.
+
+---
+
+## YAWN004 — CollectionJoinWithoutDistinct
+
+### Intent
+
+Detect ORM queries that join a collection association (one-to-many, many-to-many)
+without deduplicating the result, causing duplicate parent rows in the returned
+list.
+
+### Matched syntax
+
+- Lambda passed to configurable query constructors (`query`, `select`, `from`)
+  that contains a `.join()` call.
+- Terminal calls: `list`, `toList`, `asList`, `single`, `first`, `one`, `find`.
+- Deduplication indicators that suppress the finding: `distinctRootEntity`, `distinctBy`, `Distinct`.
+
+### Deliberately unmatched syntax
+
+- `.join()` inside a lambda that does *not* pass through a recognized query
+  constructor (false positives on plain collection joins).
+- Fetch joins that do not duplicate rows (e.g. single-ended associations like
+  many-to-one). The rule cannot distinguish association types without type
+  resolution, so it flags all joins. Users silence by adding a deduplication step.
+
+### Confidence
+
+**Medium.** A join inside a query constructor is a strong signal, but the rule
+cannot determine whether the joined association is collection-valued without
+type resolution. If a join is on a single-ended (many-to-one) association, no
+duplication occurs and the finding is a false positive.
+
+### Violation example
+
+```kotlin
+val authors = session.query(AuthorTable) {
+    join(BookTable::class)
+}.list()
+// if Author → Book is one-to-many, each author appears once per book
+```
+
+### Safe direction
+
+```kotlin
+val authors = session.query(AuthorTable) {
+    join(BookTable::class)
+}.distinctRootEntity().list()
+```
+
+### Remediation options
+
+- Add `.distinctRootEntity()` (or `.distinctBy { it.id }`) to the query chain.
+- Use a batch-query / secondary query pattern instead of a join.
+- If the association is single-ended, suppress the finding manually.
+
+### Test cases
+
+11 tests covering: `.join()` in lambda, various terminals, multiple joins,
+deduplication indicators (`distinctRootEntity`, `distinctBy`, `Distinct`),
+configurable constructor names, negative cases for joins outside queries.
+
+### Known limitations
+
+- No type resolution means the rule cannot distinguish collection joins from
+  single-ended joins — all joins are flagged.
+- Joins constructed through string-based APIs or helper functions are not detected.
+- The deduplication step may itself have overhead for large result sets.
