@@ -16,7 +16,7 @@ call expressions, dot-qualified chains, or control-flow constructs the way
 Detekt's PSI visitors can. KSP is designed for annotation-processing use cases
 (like Room or Moshi), not for pattern-based static analysis.
 
-## Why not an IntelliJ plugin for the MVP
+## Why not an IntelliJ plugin
 
 An IntelliJ plugin would require a different distribution mechanism, a
 different testing harness, and would only run inside the IDE. By building on
@@ -36,7 +36,7 @@ The dashboard is a pure static site that consumes this JSON. This means:
 - Either layer can be replaced independently.
 - The same SARIF can be uploaded to GitHub code scanning without the dashboard.
 
-## Why deterministic detection is separated from AI remediation
+## Why deterministic detection is separated from a potential future AI remediation layer
 
 Findings are always produced by deterministic PSI rules — no AI ever creates or
 suppresses a finding. If an AI remediation feature is added later, it receives
@@ -44,9 +44,13 @@ a single finding and limited context, produces a reviewable patch, and clearly
 labels all output as generated. Detection is the source of truth; AI is an
 optional explanation and suggestion layer.
 
-## Why the demo codebase uses a fake DSL
+## Why the demo codebase uses an Exposed-style DSL
 
 The demo codebase compiles and runs, but it uses stub types (e.g. `Query<T>`,
-`Session`, `ShippingClient`) that provide the method signatures needed for
-analysis without depending on Hibernate, a real database, or network services.
-This keeps the demo self-contained, fast to build, and deterministic.
+`Session`, `ShippingClient`) that mimic an Exposed-style ORM DSL — providing
+the method signatures needed for analysis without depending on Hibernate, a
+real database, or network services. The rules are configured to match these
+method names (`query`, `list`, `single`, `transaction`, etc.), so the same
+patterns found in a real Exposed codebase are reproduced in the demo without
+any ORM dependency. This keeps the demo self-contained, fast to build, and
+deterministic.
