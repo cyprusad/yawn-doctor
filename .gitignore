@@ -11,8 +11,9 @@ build/
 .DS_Store
 Thumbs.db
 
-# Plan doc (removed from tracking)
+# Personal docs (removed from tracking)
 yawn-doctor-plan.md
+docs/learning-notes.md
 
 # Node.js / dashboard
 node_modules/
