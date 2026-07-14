@@ -189,9 +189,11 @@ outside transactions and for local helpers.
 
 ### Intent
 
-Detect ORM queries that join a collection association (one-to-many, many-to-many)
-without deduplicating the result, causing duplicate parent rows in the returned
-list.
+Identify ORM query call sites where a configured join may produce duplicate root
+entities. The rule serves as a guardrail — it cannot prove that duplication
+occurs (no type resolution), nor can it prevent the underlying database transfer
+and hydration overhead. Even with application-level deduplication, the data has
+already been sent over the wire and materialized.
 
 ### Matched syntax
 
@@ -235,8 +237,15 @@ val authors = session.query(AuthorTable) {
 ### Remediation options
 
 - Add `.distinctRootEntity()` (or `.distinctBy { it.id }`) to the query chain.
+  **Caveat:** Application-level deduplication is a per-call-site workaround.
+  SQL `DISTINCT` alone does not deduplicate root entities when child columns
+  differ, and `.distinctBy` does not prevent the database from transferring
+  and hydrating the duplicate rows in the first place — it only collapses the
+  returned Kotlin list.
 - Use a batch-query / secondary query pattern instead of a join.
 - If the association is single-ended, suppress the finding manually.
+- If the ORM provides a native distinct-root API (e.g. JPA's
+  `DISTINCT_ROOT_ENTITY`), prefer it over application-level deduplication.
 
 ### Test cases
 
@@ -250,3 +259,11 @@ configurable constructor names, negative cases for joins outside queries.
   single-ended joins — all joins are flagged.
 - Joins constructed through string-based APIs or helper functions are not detected.
 - The deduplication step may itself have overhead for large result sets.
+- SQL `DISTINCT` does not deduplicate root entities when projected child columns
+  differ — it only eliminates fully-duplicate rows. A join of a root entity with
+  a one-to-many child produces rows that differ in the child columns, so
+  `SELECT DISTINCT` returns all of them.
+- Application-level deduplication (`.distinctBy { it.id }`) collapses the
+  returned list but does not prevent the database from transferring and hydrating
+  the duplicate rows. The overhead of the join (network transfer, result-set
+  materialization, object construction) has already occurred.

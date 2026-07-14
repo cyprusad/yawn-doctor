@@ -70,3 +70,13 @@
   is not detected.
 - The `joinFunctionNames` and `queryConstructors` lists are configurable in
   `detekt.yml` to match the actual method names used in the codebase.
+- **SQL `DISTINCT` is not a solution.** `SELECT DISTINCT` only eliminates
+  fully-duplicate rows. When child columns differ (as they do in a one-to-many
+  join), every row is unique and `DISTINCT` returns all of them. Root-entity
+  deduplication requires application-level logic or a native ORM API
+  (e.g. JPA's `DISTINCT_ROOT_ENTITY`).
+- **Application-level deduplication is a workaround.** `.distinctBy { it.id }`
+  collapses the returned list but does not prevent the database from
+  transferring and hydrating the duplicate rows. The join overhead (network
+  transfer, result-set materialization, object construction) has already
+  occurred before `.distinctBy` runs.

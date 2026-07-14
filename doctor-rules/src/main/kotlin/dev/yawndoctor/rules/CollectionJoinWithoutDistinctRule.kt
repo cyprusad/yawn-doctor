@@ -59,7 +59,10 @@ class CollectionJoinWithoutDistinctRule(config: Config) : Rule(config) {
                 entity = Entity.from(expression),
                 message = "[YAWN004][MEDIUM] Entity query contains a configured join and calls `${callee}()` " +
                     "without a recognized root-deduplication step. If the join targets a collection " +
-                    "association, duplicate root entities may be returned.",
+                    "association, duplicate root entities may be returned. Note that SQL DISTINCT alone " +
+                    "does not deduplicate root entities when child columns differ, and application-level " +
+                    ".distinctBy is a per-call-site workaround that does not prevent the underlying " +
+                    "hydration overhead.",
             ),
         )
     }
