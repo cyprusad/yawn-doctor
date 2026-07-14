@@ -287,6 +287,35 @@ The script maps `RuleName` to `YAWN_ID` via a `case` statement.
 GITHUB_WORKSPACE=$PWD ./scripts/gh-annotations.sh
 ```
 
+## Gradle build script pitfalls
+
+### `exec(Action)` deprecated in Gradle 9
+
+`Task.exec { }` and `Project.exec { }` inside `doLast` both trigger the
+deprecation "Use ExecOperations.exec(Action) or ProviderFactory.exec(Action)
+instead." Getting `ExecOperations` or `ProviderFactory` in a Kotlin script's
+`doLast` block is error-prone due to implicit receiver changes.
+
+**Workaround:** Use Kotlin's `ProcessBuilder` directly — no Gradle API, no
+deprecation, and the code is trivially portable.
+
+```kotlin
+fun runPnpm(dashboardDir: java.io.File, vararg args: String) {
+    val proc = ProcessBuilder("pnpm", *args)
+        .directory(dashboardDir)
+        .inheritIO()
+        .start()
+    val exit = proc.waitFor()
+    if (exit != 0) throw GradleException("pnpm ${args.joinToString(" ")} failed with exit code $exit")
+}
+```
+
+Then call it inside `doLast`:
+
+```kotlin
+runPnpm(dashboardDir, "report")
+```
+
 ### Bash pitfall: `((count++))` with `set -e`
 
 `((count++))` returns exit code 1 when the old value is 0 (the increment
