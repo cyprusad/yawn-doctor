@@ -57,9 +57,9 @@ class CollectionJoinWithoutDistinctRule(config: Config) : Rule(config) {
             CodeSmell(
                 issue = issue,
                 entity = Entity.from(expression),
-                message = "[YAWN004][HIGH] Entity query joins a collection and calls `${callee}()` " +
-                    "without deduplication. Collection joins can return duplicate root entities. " +
-                    "Add `.distinctBy { it.id }` or, when available, `.distinctRootEntity()`.",
+                message = "[YAWN004][MEDIUM] Entity query contains a configured join and calls `${callee}()` " +
+                    "without a recognized root-deduplication step. If the join targets a collection " +
+                    "association, duplicate root entities may be returned.",
             ),
         )
     }

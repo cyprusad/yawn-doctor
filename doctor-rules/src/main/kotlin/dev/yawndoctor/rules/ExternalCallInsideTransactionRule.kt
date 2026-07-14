@@ -59,7 +59,7 @@ class ExternalCallInsideTransactionRule(config: Config) : Rule(config) {
             CodeSmell(
                 issue = issue,
                 entity = Entity.from(expression),
-                message = "[YAWN003][HIGH] External call `${callDescription}()` occurs " +
+                message = "[YAWN003][MEDIUM] External call `${callDescription}()` occurs " +
                     "inside a transaction (${describeContext(context)}). " +
                     "External I/O may extend lock duration and create " +
                     "ambiguous partial-failure behavior.",
