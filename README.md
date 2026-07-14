@@ -8,17 +8,15 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 - [Architecture](docs/architecture.md) — Why Detekt, why SARIF, design tradeoffs.
 - [Rule Design](docs/rule-design.md) — Per-rule intent, matched syntax, confidence, remediation.
 - [False Positives](docs/false-positives.md) — Known limitations and blind spots.
-- [Demo Script](docs/demo-script.md) — Under-60-second walkthrough.
-- [Learning Notes](docs/learning-notes.md) — Development log and surprises.
 
 ## What it detects
 
 | Rule | ID | Detects |
 |---|---|---|
-| QueryInsideLoop | YAWN001 | ORM query terminals (`list`, `first`, `single`, `count`) inside iteration constructs (`forEach`, `map`, `for`, `while`) — the N+1 pattern. |
-| MaterializedCount | YAWN002 | Query results fully materialized via `.list()` and then counted with `.size` or `.count()` instead of a database-level count. |
-| ExternalCallInsideTransaction | YAWN003 | External I/O calls (matching configurable receiver/method patterns) inside a transaction scope (`@Transactional` annotation or lambda-based `transaction {}`, `open {}`, etc.). |
-| CollectionJoinWithoutDistinct | YAWN004 | Entity queries that join collection associations and call `.list()` without deduplication, risking duplicate root entities in the result. |
+| `QueryInsideLoop` | `YAWN001` | ORM query terminals (`list`, `first`, `single`, `count`) inside iteration constructs (`forEach`, `map`, `for`, `while`) — the N+1 pattern. |
+| `MaterializedCount` | `YAWN002` | Query results fully materialized via `.list()` and then counted with `.size` or `.count()` instead of a database-level count. |
+| `ExternalCallInsideTransaction` | `YAWN003` | External I/O calls (matching configurable receiver/method patterns) inside a transaction scope (`@Transactional` annotation or lambda-based `transaction {}`, `open {}`, etc.). |
+| `CollectionJoinWithoutDistinct` | `YAWN004` | Entity queries that join collection associations and call `.list()` without deduplication, risking duplicate root entities in the result. |
 
 ## Prerequisites
 
@@ -34,15 +32,15 @@ Explainable static analysis for risky Kotlin ORM patterns, built as a
 # Run the demo with coloured rustc-style output
 ./gradlew :demo-codebase:yawnDoctorDemo
 
-# Generate SARIF + findings.json + verify all 3 rule IDs are present
+# Full report pipeline: SARIF → findings.json → verify → build dashboard
 ./gradlew yawnDoctorReport
 
 # Individual steps:
-./gradlew :demo-codebase:detektMain                           # generate SARIF
-cd dashboard && pnpm report && pnpm verify-report             # convert + verify
+./gradlew :demo-codebase:detektMain     # generate SARIF
+./gradlew yawnDoctorConvert             # SARIF → findings.json
 
-# Dashboard:
-cd dashboard && pnpm dev                                      # dev server at http://localhost:3000
+# Dashboard dev server at http://localhost:3000
+./gradlew yawnDoctorDashboard
 ```
 
 ## Project structure
