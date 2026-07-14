@@ -54,3 +54,19 @@
 - The rule does not know whether a method performs actual network I/O. A
   `ShippingClient.reserve()` that simply writes to a local cache is flagged the
   same as one that calls a REST API.
+
+## YAWN004 — CollectionJoinWithoutDistinct
+
+- **False negatives** occur when deduplication is applied through a mechanism
+  the rule does not recognise (e.g. a custom `distinct` extension function, or
+  deduplication via a `HashSet` after `.list()`). Only methods listed in
+  `distinctMethods` are considered as deduplication.
+- **False positives** are possible when a query joins a collection but the
+  application guarantees one-to-one cardinality (e.g. via a unique constraint),
+  making deduplication redundant. The rule cannot reason about database schema
+  or constraints.
+- The rule only inspects lambdas passed to query constructors. A join applied
+  to the query object after construction (e.g. `query.adjustColumnSet { ... }`)
+  is not detected.
+- The `joinFunctionNames` and `queryConstructors` lists are configurable in
+  `detekt.yml` to match the actual method names used in the codebase.
