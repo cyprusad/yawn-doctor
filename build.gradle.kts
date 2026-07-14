@@ -39,6 +39,7 @@ tasks.register("yawnDoctorDashboard") {
             logger.warn("dashboard/node_modules not found — running pnpm install")
             runPnpm(dashboardDir, "install")
         }
+        println("\n  Yawn Doctor dashboard at http://localhost:3000\n")
         runPnpm(dashboardDir, "dev")
     }
 }
